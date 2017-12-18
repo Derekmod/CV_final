@@ -38,3 +38,7 @@ def main():
     #plot
     plt.plot(step_list, error_list)
     plt.show()
+
+
+if __name__ == '__main__':
+    main()

@@ -5,7 +5,7 @@ import math
 
 TEMP_FILENAME = '__temp_predictions.csv'
 
-def evaluateLabel(spec, label, record_dir, ground_truth_filename):
+def evaluateLabel(spec, record_dir, ground_truth_filename, label=None):
     truths = getGroundTruths(ground_truth_filename)
 
     sum_err = 0.
@@ -13,25 +13,35 @@ def evaluateLabel(spec, label, record_dir, ground_truth_filename):
         generatePredictions(spec, record_name)
         predictions = parsePredictions(TEMP_FILENAME)
         for id in predictions:
-            target = 0
-            if label in truths[id]:
-                target = 1
+            label_list = [label]
+            if label is None:
+                label_list = predictions[id].keys()
 
-            pred = predictions[id][label]
-            sum_err += BCELoss(pred, target)
+            for tlabel in label_list:
+                target = 0
+                if label in truths[id]:
+                    target = 1
+
+                pred = predictions[id][label]
+                sum_err += BCELoss(pred, target)
 
     return sum_err
+
+
+def getStepList(spec):
+    model_files = os.listdir(spec.parent_dir)
+    step_list = []
+    for filename in model_files:
+        if filename[-4:0] == 'meta':
+            step_list += int(filename[11:-5])
+    return step_list
 
 
 def stepPredictions(spec, record_name, video_id, output_filename):
     outfile = open(output_filename, 'w')
     outfile.write('Step,Predictions\n')
 
-    model_files = os.listdir(spec.parent_dir)
-    step_list = []
-    for filename in model_files:
-        if filename[-4:0] == 'meta':
-            step_list += int(filename[11:-5])
+    step_list = getStepList(spec)
 
     for step in step_list:
         generatePredictions(spec, record_name)

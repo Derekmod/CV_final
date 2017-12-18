@@ -12,17 +12,17 @@ def evaluateLabel(spec, record_dir, ground_truth_filename, label=None):
     for record_name in os.listdir(record_dir):
         generatePredictions(spec, record_name)
         predictions = parsePredictions(TEMP_FILENAME)
-        for id in predictions:
+        for vid in predictions:
             label_list = [label]
             if label is None:
-                label_list = predictions[id].keys()
+                label_list = predictions[vid].keys()
 
             for tlabel in label_list:
                 target = 0
-                if label in truths[id]:
+                if label in truths[vid]:
                     target = 1
 
-                pred = predictions[id][label]
+                pred = predictions[vid][label]
                 sum_err += BCELoss(pred, target)
 
     return sum_err
@@ -77,7 +77,7 @@ def generatePredictions(spec, record_name):
     command = format_string.format(TEMP_FILENAME, record_name, model_dir)
     os.system(command)
 
-def getGroundTruths(filename):
+def getGroundTruths(filename): #verified
     '''
     Args:
         filename: name of ground truths file
@@ -89,9 +89,9 @@ def getGroundTruths(filename):
     file = open(filename)
     #file.readline()
     for line in file:
-        id, data = line.strip().split(',')
+        vid, data = line.strip().split(',')
         labels = data.split(' ')
-        truths[id] = set([int(label) for label in labels])
+        truths[vid] = set([int(label) for label in labels])
 
     return truths
 
@@ -102,12 +102,12 @@ def parsePredictions(filename):
     file = open(filename)
     file.readline()
     for line in file:
-        id, data = line.strip().split(',')
+        vid, data = line.strip().split(',')
         items = data.split(' ')
         label_probs = dict()
         for idx in range(0, len(data), 2):
             label_probs[data[idx]] = float(data[idx+1])
-        predictions[id] = label_probs
+        predictions[vid] = label_probs
     return predictions
 
 

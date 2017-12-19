@@ -29,13 +29,18 @@ args = parser.parse_args()
 
 def main():
     spec = ModelSpec(args.frame, step=-1, parent_dir=args.model_dir)
+    truths = getGroundTruths(args.ground_truths)
 
     os.system('rm -rf ' + args.output_dir)
     os.system('mkdir ' + args.output_dir)
 
     for step in evaluation.getStepList(spec):
         spec.step = step
-    pass
+        
+        filename = 'err_{}.csv'.format(step)
+        filepath = os.path.join(args.output_dir, filename)
+
+        evaluation.evaluateLabel(spec, args.data_dir, truths, output_filename=filepath, train=args.train)
 
 
 

@@ -31,7 +31,7 @@ def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_fi
 
                 sum_err += err
                 if tlabel not in label_errs:
-                    label_errs[tlabe] += 0.
+                    label_errs[tlabel] = 0.
                 label_errs[tlabel] += err
 
     if output_filename is not None:

@@ -32,10 +32,10 @@ def main():
 
     # generate naive errors
     video_count = label_counts['']
+    del label_counts['']
     naive_errs = dict()
     for label in label_counts:
         p = float(label_counts[label])/float(video_count)
-        print p
         naive_errs[label] = evaluation.BCELoss(p, p) * video_count
 
     # load label errors

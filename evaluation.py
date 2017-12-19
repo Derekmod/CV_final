@@ -5,8 +5,8 @@ import math
 
 TEMP_FILENAME = '__temp_predictions.csv'
 
-def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_filename=None, train=True, num_records=10):
-    truths = getGroundTruths(ground_truth_filename)
+def evaluateLabel(spec, record_dir, truths, label=None, output_filename=None, train=True, num_records=10):
+    #truths = getGroundTruths(ground_truth_filename)
     label_list = [label]
     if label is None:
         label_list = truths.keys()

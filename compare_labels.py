@@ -29,7 +29,8 @@ def main():
     spec = ModelSpec(args.frame, step=-1, parent_dir=args.model_dir)
 
     # load label counts
-    label_counts = labelCount.labelCount(args.data_dir, args.ground_truths, args.train)
+    truths = getGroundTruths(args.ground_truths)
+    label_counts = labelCount.labelCount(args.data_dir, truths, args.train)
 
     # generate naive errors
     video_count = label_counts['']

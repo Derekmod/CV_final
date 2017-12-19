@@ -29,7 +29,7 @@ args = parser.parse_args()
 
 def main():
     spec = ModelSpec(args.frame, step=-1, parent_dir=args.model_dir)
-    truths = getGroundTruths(args.ground_truths)
+    truths = evaluation.getGroundTruths(args.ground_truths)
 
     os.system('rm -rf ' + args.output_dir)
     os.system('mkdir ' + args.output_dir)

@@ -7,6 +7,9 @@ TEMP_FILENAME = '__temp_predictions.csv'
 
 def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_filename=None, train=True):
     truths = getGroundTruths(ground_truth_filename)
+    label_list = [label]
+    if label is None:
+        label_list = truths.keys()
 
     sum_err = 0.
     label_errs = dict()
@@ -14,16 +17,16 @@ def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_fi
         generatePredictions(spec, record_name)
         predictions = parsePredictions(TEMP_FILENAME)
         for vid in predictions:
-            label_list = [label]
-            if label is None:
-                label_list = predictions[vid].keys()
 
             for tlabel in label_list:
                 target = 0
                 if tlabel in truths[vid]:
                     target = 1
 
-                pred = predictions[vid][tlabel]
+                if tlabel not in predictions[vid]:
+                    pred = 0.005
+                else:
+                    pred = predictions[vid][tlabel]
                 err = BCELoss(pred, target)
 
                 sum_err += err

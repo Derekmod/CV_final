@@ -24,10 +24,13 @@ from evaluation import *
 def labelCount(feature_dir, ground_truth, isTrain):
     gtDict = getGroundTruths(ground_truth)
     counts = dict()
+    counts[""] = 0
     for filename in getTFRecords(feature_dir, isTrain):
         f = open(feature_dir + "/" + filename).read()
         vIds = f.split("video_id")
+        vIds = vIds[1:]
         for vid in vIds:
+            counts[""] = counts[""] + 1
             labelSet = gtDict.get(vid[6:17])
             for label in labelSet:
                 if label not in counts:

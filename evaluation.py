@@ -5,10 +5,11 @@ import math
 
 TEMP_FILENAME = '__temp_predictions.csv'
 
-def evaluateLabel(spec, record_dir, ground_truth_filename, label=None):
+def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_filename=None):
     truths = getGroundTruths(ground_truth_filename)
 
     sum_err = 0.
+    label_errs = dict()
     for record_name in os.listdir(record_dir):
         generatePredictions(spec, record_name)
         predictions = parsePredictions(TEMP_FILENAME)
@@ -19,12 +20,24 @@ def evaluateLabel(spec, record_dir, ground_truth_filename, label=None):
 
             for tlabel in label_list:
                 target = 0
-                if label in truths[vid]:
+                if tlabel in truths[vid]:
                     target = 1
 
-                pred = predictions[vid][label]
-                sum_err += BCELoss(pred, target)
+                pred = predictions[vid][tlabel]
+                err = BCELoss(pred, target)
 
+                sum_err += err
+                if tlabel not in label_errs:
+                    label_errs[tlabe] += 0.
+                label_errs[tlabel] += err
+
+    if output_filename is not None:
+        outfile = open(output_filename, 'w')
+        for tlabel in label_errs:
+            outfile.write(tlabel + ',' + label_errs[tlabel] + '\n')
+
+    if label is None:
+        return label_errs
     return sum_err
 
 

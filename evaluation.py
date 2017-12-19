@@ -9,11 +9,15 @@ def evaluateLabel(spec, record_dir, truths, label=None, output_filename=None, tr
     #truths = getGroundTruths(ground_truth_filename)
     label_list = [label]
     if label is None:
-        label_list = truths.keys()
+        label_list = range(1000)
 
     sum_err = 0.
     label_errs = dict()
+    trial = 0
+    print record_dir
     for record_name in getTFRecords(record_dir, train)[:num_records]:
+        print 'reading record %d' % trial
+        trial += 1
         generatePredictions(spec, record_name)
         predictions = parsePredictions(TEMP_FILENAME)
         for vid in predictions:
@@ -37,7 +41,7 @@ def evaluateLabel(spec, record_dir, truths, label=None, output_filename=None, tr
     if output_filename is not None:
         outfile = open(output_filename, 'w')
         for tlabel in label_errs:
-            outfile.write(tlabel + ',' + label_errs[tlabel] + '\n')
+            outfile.write('%d,%f\n' % (tlabel, label_errs[tlabel]))
 
     if label is None:
         return label_errs
@@ -48,8 +52,10 @@ def getStepList(spec):
     model_files = os.listdir(spec.parent_dir)
     step_list = []
     for filename in model_files:
-        if filename[-4:0] == 'meta':
-            step_list += int(filename[11:-5])
+        if filename[-4:] == 'meta':
+            step_list += [int(filename[11:-5])]
+    if 0 in step_list:
+        step_list.remove(0)
     return step_list
 
 
@@ -72,25 +78,35 @@ def stepPredictions(spec, record_name, video_id, output_filename):
 def copyModel(spec, output_dir):
     os.system('rm -r {}'.format(output_dir))
     os.system('mkdir {}'.format(output_dir))
-    os.system('mkdir {}'.format(os.path.join(output_dir, 'export')))
-    format_string = 'cp {} {} -r'
-    base_string = format_string.format('{}', output_dir)
+    export_dir = os.path.join(output_dir, 'export')
+    os.system('mkdir {}'.format(export_dir))
+    step_dir = os.path.join(export_dir, 'step_{}'.format(spec.step))
+    #os.system('mkdir {}'.format(step_dir))
 
-    file_template = 'model.ckpt-{}*'.format(spec.step)
-    file_template = os.path.join(spec.parent_dir, file_template)
-    os.system(base_string.format(file_template))
+    src = os.path.join(spec.parent_dir, 'model.ckpt-{}.*'.format(spec.step))
+    src2 = os.path.join(spec.parent_dir, 'model.ckpt-{}.index'.format(spec.step))
+    src3 = os.path.join(spec.parent_dir, 'model.ckpt-{}.meta'.format(spec.step))
+    dest = output_dir
+    os.system('cp {} {}'.format(src, dest))
+    os.system('cp {} {}'.format(src2, dest))
+    os.system('cp {} {}'.format(src3, dest))
 
-    export_template = 'export/step_{}/*'.format(spec.step)
-    export_template = os.path.join(spec.parent_dir, export_template)
-    os.system(base_string.format(export_template))
+    step_ext = 'export/step_{}'.format(spec.step)
+    src = os.path.join(spec.parent_dir, step_ext)
+    dest = os.path.join(output_dir, 'export')
+    os.system('cp -r {} {}'.format(src, dest))
+
+    f = open(os.path.join(output_dir, 'checkpoint'), 'w')
+    f.write('model_checkpoint_path: "model.ckpt-{}"\n'.format(spec.step))
 
 
 def generatePredictions(spec, record_name):
     if spec.step < 0:
         model_dir = spec.parent_dir
     else:
-        model_dir = 't-' + spec.parent_dir
+        model_dir = spec.parent_dir + "t"
         copyModel(spec, model_dir)
+    print record_name + " generatePredictions"
 
     format_string = 'python ../youtube-8m/inference.py --output_file={} --input_data_pattern={} --train_dir={}'
     command = format_string.format(TEMP_FILENAME, record_name, model_dir)
@@ -142,10 +158,11 @@ def BCELoss(pred, target):
         target = int(target)
     target = float(target)
 
-    return - target * math.log(1.-pred) - (1-target) * math.log(pred)
+    return - target * math.log(pred) - (1-target) * math.log(1.-pred)
 
 def getTFRecords(feature_dir, isTrain):
     res = []
+    print feature_dir + " in getTFRecords"
     for filename in os.listdir(feature_dir):
         if isTrain:
             if filename.startswith("train"):

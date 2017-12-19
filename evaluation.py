@@ -5,7 +5,7 @@ import math
 
 TEMP_FILENAME = '__temp_predictions.csv'
 
-def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_filename=None, train=True):
+def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_filename=None, train=True, num_records=10):
     truths = getGroundTruths(ground_truth_filename)
     label_list = [label]
     if label is None:
@@ -13,7 +13,7 @@ def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_fi
 
     sum_err = 0.
     label_errs = dict()
-    for record_name in getTFRecords(record_dir, train):
+    for record_name in getTFRecords(record_dir, train)[:num_records]:
         generatePredictions(spec, record_name)
         predictions = parsePredictions(TEMP_FILENAME)
         for vid in predictions:

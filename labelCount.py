@@ -21,8 +21,8 @@ from evaluation import *
 #                 labelSet = gtDict.get(vid[6:17])
 
 
-def labelCount(feature_dir, ground_truth, isTrain):
-    gtDict = getGroundTruths(ground_truth)
+def labelCount(feature_dir, gtDict, isTrain):
+    #gtDict = getGroundTruths(ground_truth)
     counts = dict()
     counts[""] = 0
     for filename in getTFRecords(feature_dir, isTrain):

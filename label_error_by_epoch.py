@@ -1,9 +1,11 @@
 import evaluation
-import labelCount
 from model_spec import ModelSpec
+import os
+
+import argparse
 
 import matplotlib.pyplot as plt
-import argparse
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true",
@@ -13,7 +15,7 @@ parser.add_argument("--data_dir", type=str)
 parser.add_argument("--ground_truths", type=str)
 parser.add_argument("-t", "--train", action="store_true")
 parser.add_argument("-f", "--frame", action="store_true")
-parser.add_argument("--num_labels", type=int)
+parser.add_argument("--output_dir", type=str)
 #parser.add_argument("-a", "--augment", action="store_true",
 #                    help="augment training data")
 #parser.add_argument("--learning_rate", type=float)
@@ -28,31 +30,14 @@ args = parser.parse_args()
 def main():
     spec = ModelSpec(args.frame, step=-1, parent_dir=args.model_dir)
 
-    # load label counts
-    truths = getGroundTruths(args.ground_truths)
-    label_counts = labelCount.labelCount(args.data_dir, truths, args.train)
+    os.system('rm -rf ' + args.output_dir)
+    os.system('mkdir ' + args.output_dir)
 
-    # generate naive errors
-    video_count = label_counts['']
-    del label_counts['']
-    naive_errs = dict()
-    for label in label_counts:
-        p = float(label_counts[label])/float(video_count)
-        naive_errs[label] = evaluation.BCELoss(p, p) * video_count
-
-    # load label errors
-    label_errs = evaluation.evaluateLabel(spec, args.data_dir, truths, args.train)
-
-    X = []
-    Y = []
-    for label in label_errs:
-        X += [float(label_counts[label])/video_count]
-        Y += [float(naive_errs[label]) / float(label_errs[label])]
-    plt.plot(X, Y)
-    plt.show()
+    for step in evaluation.getStepList(spec):
+        spec.step = step
     pass
 
 
 
-if __name__ == '__main__':
+if __name__=='__main__':
     main()

@@ -93,7 +93,7 @@ def generatePredictions(spec, record_name):
     command = format_string.format(TEMP_FILENAME, record_name, model_dir)
     pid = os.system(command)
     #print 'status of "%s" = %d' % (command, os.system(command))
-    os.waitpid(pid, None)
+    os.waitpid(pid, 0)
 
 def getGroundTruths(filename): #verified
     '''

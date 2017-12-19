@@ -125,8 +125,8 @@ def parsePredictions(filename):
         vid, data = line.strip().split(',')
         items = data.split(' ')
         label_probs = dict()
-        for idx in range(0, len(data), 2):
-            label_probs[data[idx]] = float(data[idx+1])
+        for idx in range(0, len(items), 2):
+            label_probs[items[idx]] = float(items[idx+1])
         predictions[vid] = label_probs
     return predictions
 

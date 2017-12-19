@@ -107,6 +107,8 @@ def getGroundTruths(filename): #verified
     file = open(filename)
     #file.readline()
     for line in file:
+        if len(line) < 10:
+            continue
         vid, data = line.strip().split(',')
         labels = data.split(' ')
         truths[vid] = set([int(label) for label in labels])

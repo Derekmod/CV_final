@@ -83,8 +83,11 @@ def copyModel(spec, output_dir):
 
 
 def generatePredictions(spec, record_name):
-    model_dir = 't-' + spec.parent_dir
-    copyModel(spec, model_dir)
+    if spec.step < 0:
+        model_dir = spec.parent_dir
+    else:
+        model_dir = 't-' + spec.parent_dir
+        copyModel(spec, model_dir)
 
     format_string = 'python inference.py --outfule_file={} --input_data_pattern={} --train_dir={}'
     command = format_string.format(TEMP_FILENAME, record_name, model_dir)

@@ -25,7 +25,7 @@ args = parser.parse_args()
 
 
 def main():
-    spec = ModelSpec(args.frame, step=0, parent_dir=args.model_dir)
+    spec = ModelSpec(args.frame, step=-1, parent_dir=args.model_dir)
 
     # load label counts
     label_counts = labelCount.labelCount(args.data_dir, args.ground_truths, args.train)

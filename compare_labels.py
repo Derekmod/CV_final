@@ -13,6 +13,7 @@ parser.add_argument("--data_dir", type=str)
 parser.add_argument("--ground_truths", type=str)
 parser.add_argument("-t", "--train", action="store_true")
 parser.add_argument("-f", "--frame", action="store_true")
+parser.add_argument("--num_labels", type=int)
 #parser.add_argument("-a", "--augment", action="store_true",
 #                    help="augment training data")
 #parser.add_argument("--learning_rate", type=float)

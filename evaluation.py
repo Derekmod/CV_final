@@ -91,7 +91,9 @@ def generatePredictions(spec, record_name):
 
     format_string = 'python inference.py --outfule_file={} --input_data_pattern={} --train_dir={}'
     command = format_string.format(TEMP_FILENAME, record_name, model_dir)
-    os.system(command)
+    pid = os.system(command)
+    #print 'status of "%s" = %d' % (command, os.system(command))
+    os.waitpid(pid)
 
 def getGroundTruths(filename): #verified
     '''

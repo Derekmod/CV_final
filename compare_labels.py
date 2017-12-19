@@ -40,7 +40,7 @@ def main():
         naive_errs[label] = evaluation.BCELoss(p, p) * video_count
 
     # load label errors
-    label_errs = evaluation.evaluateLabel(spec, args.data_dir, args.ground_truths)
+    label_errs = evaluation.evaluateLabel(spec, args.data_dir, args.ground_truths, args.train)
 
     X = []
     Y = []

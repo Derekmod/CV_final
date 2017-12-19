@@ -26,7 +26,7 @@ def labelCount(feature_dir, ground_truth, isTrain):
     counts = dict()
     counts[""] = 0
     for filename in getTFRecords(feature_dir, isTrain):
-        f = open(feature_dir + "/" + filename).read()
+        f = open(filename).read()
         vIds = f.split("video_id")
         vIds = vIds[1:]
         for vid in vIds:
@@ -38,14 +38,3 @@ def labelCount(feature_dir, ground_truth, isTrain):
                 else:
                     counts[label] = counts[label] + 1
     return counts
-
-def getTFRecords(feature_dir, isTrain):
-    res = []
-    for filename in os.listdir(feature_dir):
-        if isTrain:
-            if "train" in filename:
-                res.append(filename)
-        else:
-            if "validate" in filename:
-                res.append(filename)
-    return res

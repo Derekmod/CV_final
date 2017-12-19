@@ -5,12 +5,12 @@ import math
 
 TEMP_FILENAME = '__temp_predictions.csv'
 
-def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_filename=None):
+def evaluateLabel(spec, record_dir, ground_truth_filename, label=None, output_filename=None, train=True):
     truths = getGroundTruths(ground_truth_filename)
 
     sum_err = 0.
     label_errs = dict()
-    for record_name in os.listdir(record_dir):
+    for record_name in getTFRecords(record_dir, train):
         generatePredictions(spec, record_name)
         predictions = parsePredictions(TEMP_FILENAME)
         for vid in predictions:
@@ -89,7 +89,7 @@ def generatePredictions(spec, record_name):
         model_dir = 't-' + spec.parent_dir
         copyModel(spec, model_dir)
 
-    format_string = 'python inference.py --outfule_file={} --input_data_pattern={} --train_dir={}'
+    format_string = 'python ../youtube-8m/inference.py --output_file={} --input_data_pattern={} --train_dir={}'
     command = format_string.format(TEMP_FILENAME, record_name, model_dir)
     #pid = os.system(command)
     print 'status of "%s" = %d' % (command, os.system(command))
@@ -138,3 +138,14 @@ def BCELoss(pred, target):
     target = float(target)
 
     return - target * math.log(1.-pred) - (1-target) * math.log(pred)
+
+def getTFRecords(feature_dir, isTrain):
+    res = []
+    for filename in os.listdir(feature_dir):
+        if isTrain:
+            if filename.startswith("train"):
+                res.append(os.path.join(feature_dir,filename))
+        else:
+            if filename.startswith("validate"):
+                res.append(os.path.join(feature_dir,filename))
+    return res

@@ -25,6 +25,8 @@ args = parser.parse_args()
 
 
 def main():
+    spec = ModelSpec(args.frame, step=0, parent_dir=args.model_dir)
+
     # load label counts
     label_counts = labelCount.labelCount(args.data_dir, args.ground_truths, args.train)
 
@@ -37,6 +39,14 @@ def main():
 
     # load label errors
     label_errs = evaluation.evaluateLabel(spec, args.data_dir, args.ground_truths)
+
+    X = []
+    Y = []
+    for label in label_errs:
+        X += [float(label_counts[label])/video_count]
+        Y += [float(naive_errs[label]) / float(label_errs[label])]
+    plt.plot(X, Y)
+    plt.show()
     pass
 
 
